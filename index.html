@@ -1,0 +1,91 @@
+<html>
+<head>
+<style>
+
+body
+{
+
+Backgroun-color:light_blue;
+
+}
+
+#main_content
+{
+padding:20px;
+width:500px;
+height:68px;
+border:solid gray 2px;
+
+}
+
+#result
+{
+margin:20px;
+padding:20px;
+width:fit-content;
+height:fit-content;
+border:solid gray 2px;
+
+}
+
+
+</style>
+</head>
+<body>
+<center><h1>Weather Information</h1>
+<br>
+<hr>
+<div id="main_content">
+<input type="text" id="city" placeholder="entr a name"><br><br>
+<button onclick="GetData()">Get Data</button><br>
+</div>
+<div id="result">
+<center><h3>Enter The City Name</h3></center>
+</div>
+
+<script>
+function GetData()
+{
+
+let place=document.getElementById("city").value;
+
+fetch("https://geocoding-api.open-meteo.com/v1/search?name="+place+"&count=1&language=en&format=json").then(response=>response.json())
+.then(data=>{
+
+if(data.results.length == 0)
+{
+
+document.getElementById("result").innerHTML=`<h2 style="color:red;">City Not Found Try Another City</h2>`;
+return;
+
+}
+
+let longitude=data.results[0].longitude;
+
+let latitude=data.results[0].latitude;
+
+
+
+weather_details(longitude,latitude,place);
+
+}
+).catch(error=>console.log(error));
+
+}
+
+function weather_details(lo,la,place)
+{
+
+fetch("https://api.open-meteo.com/v1/forecast?latitude="+la+"&longitude="+lo+"&current=temperature_2m,relative_humidity_2m,apparent_temperature,precipitation,wind_speed_10m")
+.then(response=>response.json())
+.then(data=>
+{
+console.log(data);
+document.getElementById("result").innerHTML=`<h3>Current Weather Details - ${place}</h3><br><h4 style="color:green;">current Temperature : ${data.current.apparent_temperature}<br>Wind Speed :  ${data.current.wind_speed_10m}<br>Humidity : ${data.current.relative_humidity_2m}</h4>`;
+
+})
+.catch(error=>console.log(error));
+}
+</script>
+</body>
+</html>
